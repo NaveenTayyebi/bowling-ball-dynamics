@@ -1,17 +1,17 @@
-%% Initial Trajectory
+%% Setup
 m = 4.53592; 
 D = 0.2183;
 x0 = 0; 
 y0 = 0; 
 z0 = -D/2;
-xdot0 = -2; 
+xdot0 = -2;
 ydot0 = 0; 
 zdot0 = 0; 
 s0 = 0; 
 t0 = 0; 
 p0 = 0; 
 sdot0 = 0; 
-tdot0 = 4; 
+tdot0 = 10; 
 pdot0 = 0; 
 tspan = 0:0.05:20; 
 options = odeset('RelTol',1e-12);
@@ -98,11 +98,12 @@ for i = 1:1:length(x)
     gRa = [cos(x(i,2)) 0 -sin(x(i,2)) ; 0 1 0 ; sin(x(i,2)) 0 cos(x(i,2))]; 
     bRg = [1 0 0 ; 0 cos(x(i,3)) sin(x(i,3)) ; 0 -sin(x(i,3)) cos(x(i,3))]; 
     bRn = bRg*gRa*aRn;
-    b1_n = inv(bRn)*b1_b + [x(i,7) ; x(i,8) ; x(i,9)];
-    b2_n = inv(bRn)*b2_b + [x(i,7) ; x(i,8) ; x(i,9)];
-    b3_n = inv(bRn)*b3_b + [x(i,7) ; x(i,8) ; x(i,9)];
+    % inv(bRn)* is the same as bRn\
+    b1_n = bRn\b1_b + [x(i,7) ; x(i,8) ; x(i,9)];
+    b2_n = bRn\b2_b + [x(i,7) ; x(i,8) ; x(i,9)];
+    b3_n = bRn\b3_b + [x(i,7) ; x(i,8) ; x(i,9)];
     for j =1:length(F.Points)
-        temp_Vector(j,:) = (inv(bRn)*(points_Vector(j,:))')';
+        temp_Vector(j,:) = (bRn\(points_Vector(j,:))')';
     end
     for k = 1:length(F.Points)
         temp_Vector(k,:) = temp_Vector(k,:) + [x(i,7) x(i,8) x(i,9)];
@@ -117,7 +118,7 @@ for i = 1:1:length(x)
     % Friction Vector
     NvBcm = [x(i,10) ; x(i,11) ; x(i,12)]; 
     BcmpC = [0 ; 0 ; D/2];
-    NvCprime = inv(bRn)*(bRn*NvBcm + cross(Omega,bRn*BcmpC)); 
+    NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC)); 
     NvCprime_unit = NvCprime/norm(NvCprime);
     % Plotting Axes
     hold on 
@@ -156,7 +157,9 @@ for i = 1:1:length(x)
     set(gcf, 'Position',  [300, 300, 600, 600])
     set(figure(6),'color','white');
 end 
+%% Solver
 function dXdt = solver(t,x,m,D)
+    % inv(bRn)* is the same as bRn\
     I11 = 2/5*m*(D/2)^2; 
     I22 = 2/5*m*(D/2)^2; 
     I33 = 2/5*m*(D/2)^2;
