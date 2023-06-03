@@ -1,2 +1,2 @@
 # Bowling
-![alt text](http://url/to/img.png)
+![alt text](ball.png)
