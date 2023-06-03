@@ -1,4 +1,4 @@
 # Bowling
-<div margin="auto">
+<center>
   <img src="ball.png" height="600">
-</div>
+<center>
