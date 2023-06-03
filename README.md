@@ -1,2 +1,2 @@
 # Bowling
-![alt text](ball.png)
+<img src="ball.png" height="300">
