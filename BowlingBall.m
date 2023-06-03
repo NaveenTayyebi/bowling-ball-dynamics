@@ -4,14 +4,14 @@ D = 0.2183;
 x0 = 0; 
 y0 = 0; 
 z0 = -D/2;
-xdot0 = -2;
+xdot0 = -8;
 ydot0 = 0; 
 zdot0 = 0; 
 s0 = 0; 
 t0 = 0; 
 p0 = 0; 
 sdot0 = 0; 
-tdot0 = 10; 
+tdot0 = -5; 
 pdot0 = 0; 
 tspan = 0:0.05:20; 
 options = odeset('RelTol',1e-12);
@@ -111,15 +111,15 @@ for i = 1:1:length(x)
     stl_refresh = triangulation(connect_Vector,temp_Vector); 
     h10 = trimesh(stl_refresh,'FaceColor',[0.4667 0.533 0.66],'EdgeColor',[0.2314 0.2667 0.2941]);
     % Angular Velocity Vector
-    w1 = x(i,6)-x(4)*sin(x(i,2))
-    w2 = x(i,4)*cos(x(i,2))*sin(x(i,3))+x(i,5)*cos(x(i,3))
-    w3 = x(i,4).*cos(x(i,2))*cos(x(i,3))-x(i,5)*sin(x(i,3))
+    w1 = x(i,6)-x(4)*sin(x(i,2));
+    w2 = x(i,4)*cos(x(i,2))*sin(x(i,3))+x(i,5)*cos(x(i,3));
+    w3 = x(i,4).*cos(x(i,2))*cos(x(i,3))-x(i,5)*sin(x(i,3));
     Omega = [w1 ; w2 ; w3];
     % Friction Vector
     NvBcm = [x(i,10) ; x(i,11) ; x(i,12)]; 
     BcmpC = [0 ; 0 ; D/2];
-    NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC)); 
-    NvCprime_unit = NvCprime/norm(NvCprime);
+    NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC))
+    NvCprime_unit = NvCprime/norm(NvCprime+0.0001)*heaviside(norm(NvCprime));
     % Plotting Axes
     hold on 
     h1 = plot3([x(i,7) b1_n(1)],[x(i,8) b1_n(2)], [x(i,9) b1_n(3)],'Linewidth',2,'Color','r');
@@ -160,6 +160,7 @@ end
 %% Solver
 function dXdt = solver(t,x,m,D)
     % inv(bRn)* is the same as bRn\
+    sympref('HeavisideAtOrigin',0);
     I11 = 2/5*m*(D/2)^2; 
     I22 = 2/5*m*(D/2)^2; 
     I33 = 2/5*m*(D/2)^2;
@@ -176,8 +177,8 @@ function dXdt = solver(t,x,m,D)
     NvBcm = [x(10) ; x(11) ; x(12)]; 
     BcmpC = [0 ; 0 ; D/2];
     NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC)); 
-    NvCprime_unit_slip = NvCprime/norm(NvCprime+0.00000001)*heaviside(norm(NvCprime));
-    M = bRn*cross(BcmpC,-mu_slip*NvCprime_unit_slip)*heaviside(x(7)+12)+bRn*cross(BcmpC,-mu_slip2*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
+    NvCprime_unit_slip = (NvCprime*heaviside(norm(NvCprime)))/norm(NvCprime);
+    M = bRn*cross(BcmpC,-mu_slip*NvCprime_unit_slip)*heaviside(x(7)+12);%+bRn*cross(BcmpC,-mu_slip2*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
     M1 = M(1); 
     M2 = M(2); 
     M3 = M(3); 
