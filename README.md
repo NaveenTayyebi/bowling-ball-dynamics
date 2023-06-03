@@ -1,2 +1,2 @@
 # Bowling
-<img src="ball.png" height="300">
+<img src="ball.png" height="600">
