@@ -1,19 +1,20 @@
 %% Setup
 m = 4.53592; 
+g = 9.81;
 D = 0.2183;
 x0 = 0; 
-y0 = 0; 
+y0 = 0.3; 
 z0 = -D/2;
 xdot0 = -8;
-ydot0 = 0; 
+ydot0 = -0.5; 
 zdot0 = 0; 
 s0 = 0; 
 t0 = 0; 
 p0 = 0; 
 sdot0 = 0; 
 tdot0 = -5; 
-pdot0 = 0; 
-tspan = 0:0.01:14; 
+pdot0 = 4; 
+tspan = 0:0.05:14; 
 options = odeset('RelTol',1e-12);
 ini_conds0 = [s0 t0 p0 sdot0 tdot0 pdot0 x0 y0 z0 xdot0 ydot0 zdot0];
 [t,x] = ode113(@(t,x) solver(t,x,m,D),tspan,ini_conds0,options);
@@ -38,11 +39,6 @@ points_Vector = F.Points/(10^(3));
 points_Vector = [points_Vector(:,1), points_Vector(:,2), points_Vector(:,3)];
 connect_Vector = F.ConnectivityList;
 temp_Vector_initial = zeros(size(points_Vector));
-%aRn_model_adjustment = [cos(pi/2) sin(pi/2) 0 ; -sin(pi/2) cos(pi/2) 0 ; 0 0 1];
-%for i =1:length(F.Points)
-%    temp_Vector_initial(i,:) = (inv(aRn_model_adjustment)*(points_Vector(i,:))')';
-%end
-%[F2,V2,N2] = stlread("Bowling_ball.stl");
 figure(6)
 grid on 
 hold on
@@ -119,10 +115,10 @@ for i = 1:1:length(x)
     NvBcm = [x(i,10) ; x(i,11) ; x(i,12)];
     BcmpC = [0 ; 0 ; D/2];
     NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC))
-    NvCprime_unit_slip = (NvCprime)/norm(NvCprime)*heaviside(norm(NvCprime)-0.1);
+    NvCprime_unit_slip = (NvCprime)/norm(NvCprime)*heaviside(norm(NvCprime)-0.01);
     mu_slip = 0.04; 
     mu_slip2 = 0.2; 
-    M = bRn*cross(BcmpC,-mu_slip*NvCprime_unit_slip)*heaviside(x(7)+12)+bRn*cross(BcmpC,-mu_slip2*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
+    M = bRn*cross(BcmpC,-mu_slip*m*g*NvCprime_unit_slip)*heaviside(x(7)+12)+bRn*cross(BcmpC,-mu_slip2*m*g*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
     % Plotting Axes
     hold on 
     h1 = plot3([x(i,7) b1_n(1)],[x(i,8) b1_n(2)], [x(i,9) b1_n(3)],'Linewidth',2,'Color','r');
@@ -180,8 +176,8 @@ function dXdt = solver(t,x,m,D)
     NvBcm = [x(10) ; x(11) ; x(12)]; 
     BcmpC = [0 ; 0 ; D/2];
     NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC)); 
-    NvCprime_unit_slip = (NvCprime)/norm(NvCprime)*heaviside(norm(NvCprime)-0.1);
-    M = bRn*cross(BcmpC,-mu_slip*NvCprime_unit_slip)*heaviside(x(7)+12)+bRn*cross(BcmpC,-mu_slip2*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
+    NvCprime_unit_slip = (NvCprime)/norm(NvCprime)*heaviside(norm(NvCprime)-0.01);
+    M = bRn*cross(BcmpC,-mu_slip*m*g*NvCprime_unit_slip)*heaviside(x(7)+12)+bRn*cross(BcmpC,-mu_slip2*m*g*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
     M1 = M(1); 
     M2 = M(2); 
     M3 = M(3); 
