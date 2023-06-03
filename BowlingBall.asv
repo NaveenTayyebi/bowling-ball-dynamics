@@ -114,15 +114,15 @@ for i = 1:1:length(x)
     w1 = x(i,6)-x(4)*sin(x(i,2));
     w2 = x(i,4)*cos(x(i,2))*sin(x(i,3))+x(i,5)*cos(x(i,3));
     w3 = x(i,4).*cos(x(i,2))*cos(x(i,3))-x(i,5)*sin(x(i,3));
-    Omega = [w1 ; w2 ; w3]
+    Omega = [w1 ; w2 ; w3];
     % Friction Vector
-    NvBcm = [x(i,10) ; x(i,11) ; x(i,12)];
+    NvBcm = [x(i,10) ; x(i,11) ; x(i,12)]
     BcmpC = [0 ; 0 ; D/2];
-    NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC))
-    NvCprime_unit_slip = (NvCprime)/norm(NvCprime)*heaviside(norm(NvCprime)-0.1);
+    NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC));
+    NvCprime_unit_slip = (NvCprime)/norm(NvCprime)*heaviside(norm(NvCprime)-0.1)
     mu_slip = 0.04; 
     mu_slip2 = 0.2; 
-    M = bRn*cross(BcmpC,-mu_slip*NvCprime_unit_slip)*heaviside(x(7)+12)+bRn*cross(BcmpC,-mu_slip2*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
+    %M = bRn*cross(BcmpC,-mu_slip*NvCprime_unit_slip)*heaviside(x(7)+12)+bRn*cross(BcmpC,-mu_slip2*NvCprime_unit_slip)*heaviside(-x(7)-12.001)
     % Plotting Axes
     hold on 
     h1 = plot3([x(i,7) b1_n(1)],[x(i,8) b1_n(2)], [x(i,9) b1_n(3)],'Linewidth',2,'Color','r');
