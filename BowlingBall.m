@@ -13,7 +13,7 @@ p0 = 0;
 sdot0 = 0; 
 tdot0 = -5; 
 pdot0 = 0; 
-tspan = 0:0.05:16; 
+tspan = 0:0.01:14; 
 options = odeset('RelTol',1e-12);
 ini_conds0 = [s0 t0 p0 sdot0 tdot0 pdot0 x0 y0 z0 xdot0 ydot0 zdot0];
 [t,x] = ode113(@(t,x) solver(t,x,m,D),tspan,ini_conds0,options);
@@ -119,7 +119,8 @@ for i = 1:1:length(x)
     NvBcm = [x(i,10) ; x(i,11) ; x(i,12)]; 
     BcmpC = [0 ; 0 ; D/2];
     NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC))
-    NvCprime_unit = (NvCprime)/norm(NvCprime+10^(-3))*heaviside(norm(NvCprime));
+    NvCprime_unit = (NvCprime)/norm(NvCprime+10^(-3))*heaviside(norm(NvCprime)-0.1);
+    M = bRn*cross(BcmpC,-0.04*NvCprime_unit)
     % Plotting Axes
     hold on 
     h1 = plot3([x(i,7) b1_n(1)],[x(i,8) b1_n(2)], [x(i,9) b1_n(3)],'Linewidth',2,'Color','r');
@@ -177,7 +178,7 @@ function dXdt = solver(t,x,m,D)
     NvBcm = [x(10) ; x(11) ; x(12)]; 
     BcmpC = [0 ; 0 ; D/2];
     NvCprime = bRn\(bRn*NvBcm + cross(Omega,bRn*BcmpC)); 
-    NvCprime_unit_slip = (NvCprime)/norm(NvCprime+10^(-3))*heaviside(norm(NvCprime));%+(NvCprime)/norm(NvCprime)*heaviside(-0.001-norm(NvCprime));
+    NvCprime_unit_slip = (NvCprime)/norm(NvCprime)*heaviside(norm(NvCprime)-0.1);%+(NvCprime)/norm(NvCprime)*heaviside(-0.001-norm(NvCprime));
     M = bRn*cross(BcmpC,-mu_slip*NvCprime_unit_slip);%*heaviside(x(7)+12)%+bRn*cross(BcmpC,-mu_slip2*NvCprime_unit_slip)*heaviside(-x(7)-12.001);
     M1 = M(1); 
     M2 = M(2); 
